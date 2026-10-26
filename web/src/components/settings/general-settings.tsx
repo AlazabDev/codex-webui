@@ -56,6 +56,14 @@ export function GeneralSettings({
           </div>
           <div className="flex gap-1">
             <Button
+              variant={language === 'ar' ? 'default' : 'outline'}
+              size="sm"
+              className="h-8"
+              onClick={() => changeLanguage('ar')}
+            >
+              العربية
+            </Button>
+            <Button
               variant={language.startsWith('zh') ? 'default' : 'outline'}
               size="sm"
               className="h-8"
@@ -64,7 +72,7 @@ export function GeneralSettings({
               简体中文
             </Button>
             <Button
-              variant={!language.startsWith('zh') ? 'default' : 'outline'}
+              variant={language === 'en' || !language ? 'default' : 'outline'}
               size="sm"
               className="h-8"
               onClick={() => changeLanguage('en')}
