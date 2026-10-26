@@ -3,107 +3,107 @@
 [![GHCR](https://img.shields.io/badge/GHCR-codex--webui-blue?logo=github)](https://github.com/LimLLL/codex-webui/pkgs/container/codex-webui)
 [![Docker](https://img.shields.io/badge/docker-multi--arch-brightgreen?logo=docker)](./Dockerfile)
 
-给 [OpenAI Codex CLI](https://github.com/openai/codex) 做的 Web 前端。把命令行交互搬到浏览器里，支持多线程并发、文件管理、终端、插件市场等。
+واجهة ويب أمامية لـ [OpenAI Codex CLI](https://github.com/openai/codex). تنقل التفاعل من سطر الأوامر إلى المتصفح، وتدعم تعدد الخيوط المتزامنة وإدارة الملفات والطرفية ومتجر الإضافات وغيرها.
 
-后端用 NestJS 通过 stdio JSON-RPC 和 `codex app-server` 通信，前端 React + Vite，中间用 Socket.IO 实时推送。
+الخادم الخلفي مبني بـ NestJS ويتواصل مع `codex app-server` عبر stdio JSON-RPC، والواجهة الأمامية React + Vite، وبينهما Socket.IO للدفع اللحظي.
 
 [English](./README.en.md)
 
 | | |
 |:--:|:--:|
-| <img src="./images/main.png" width="440" alt="对话与线程"><br>**对话与线程** | <img src="./images/branches.png" width="440" alt="消息级分支"><br>**消息级分支** |
-| <img src="./images/approval.png" width="440" alt="审批流程"><br>**审批流程** | <img src="./images/files.png" width="440" alt="文件管理与预览"><br>**文件管理与预览** |
-| <img src="./images/terminal.png" width="440" alt="终端"><br>**终端** | <img src="./images/integrations.png" width="440" alt="集成与插件"><br>**集成与插件** |
+| <img src="./images/main.png" width="440" alt="المحادثة والخيوط"><br>**المحادثة والخيوط** | <img src="./images/branches.png" width="440" alt="التفرعات على مستوى الرسالة"><br>**التفرعات على مستوى الرسالة** |
+| <img src="./images/approval.png" width="440" alt="مسار الموافقة"><br>**مسار الموافقة** | <img src="./images/files.png" width="440" alt="إدارة الملفات والمعاينة"><br>**إدارة الملفات والمعاينة** |
+| <img src="./images/terminal.png" width="440" alt="الطرفية"><br>**الطرفية** | <img src="./images/integrations.png" width="440" alt="التكاملات والإضافات"><br>**التكاملات والإضافات** |
 
-## 功能
+## الميزات
 
-**对话与线程**
-- 多线程并发运行，互不干扰
-- 线程按工作区分组，支持归档、fork、重命名
-- Markdown 渲染 + Shiki 代码高亮
-- `@` 引用文件、粘贴图片
-- 追问（steer）和中断（stop）正在执行的 turn
+**المحادثة والخيوط**
+- تشغيل عدة خيوط بشكل متزامن دون تداخل
+- تجميع الخيوط حسب مساحة العمل، مع دعم الأرشفة والتفرع وإعادة التسمية
+- عرض Markdown + تمييز الشيفرة عبر Shiki
+- إدراج الملفات بـ `@` ولصق الصور
+- التتبع (steer) ومقاطعة (stop) الدور الجاري تنفيذه
 
-**消息级分支**
-- 编辑任意一条历史消息即产生新版本，像 ChatGPT 一样在版本间左右切换
-- 分支图可视化整棵对话树，标注分叉点、运行状态与待审批
-- 级联删除：删除一个分支会连带其全部下游，删除前用图和列表列清将要销毁的确切集合
-- 启动时扫描 rollout 记录，认领在 WebUI 之外（如 CLI）创建的分支拓扑
+**التفرعات على مستوى الرسالة**
+- تحرير أي رسالة سابقة يُنشئ نسخة جديدة، مع إمكانية التنقل يمينًا ويسارًا بين النسخ كما في ChatGPT
+- رسم بياني للتفرعات يعرض شجرة المحادثة كاملة، مع تمييز نقاط التشعب وحالة التشغيل والموافقات المعلّقة
+- الحذف المتسلسل: حذف فرع يحذف كل ما يتفرع عنه، وقبل الحذف تُعرض بالرسم وال قائمة المجموعة الدقيقة التي ستُحذف
+- عند بدء التشغيل يُجرى مسح لسجلات rollout لاستعادة التفرعات التي أُنشئت خارج WebUI (مثل CLI)
 
-**审批流程**
-- 命令执行、文件变更的审批卡片，直接在页面上操作
-- 支持安全策略切换（sandbox 级别）
-- 多设备同时在线时的 CAS 防冲突
+**مسار الموافقة**
+- بطاقات موافقة لتنفيذ الأوامر وتغييرات الملفات، تُدار مباشرة من الصفحة
+- دعم تبديل سياسة الأمان (مستوى sandbox)
+- حماية CAS من التعارض عند اتصال عدة أجهزة في الوقت نفسه
 
-**文件管理与预览**
-- 树形文件浏览器，支持拖拽移动
-- Monaco Editor 代码编辑 + Git diff 分栏对比
-- 文件预览：PDF、图片、视频、音频、字体、二进制（hex dump）
-- 压缩包浏览：ZIP / TAR(.gz/.bz2/.xz) / RAR / 7z，无需解压即可预览内容
-- Office 文档编辑：DOCX / XLSX / PPTX（通过 OnlyOffice Document Server，可选集成）
-- 上传 / 下载 / 重命名 / 复制 / 移动 / 新建目录
+**إدارة الملفات والمعاينة**
+- متصفح ملفات شجري مع دعم السحب والإفلات للنقل
+- محرر Monaco Editor + مقارنة Git diff بعرض مقسوم
+- معاينة الملفات: PDF والصور والفيديو والصوت والخطوط والملفات الثنائية (hex dump)
+- تصفح الأرشيفات: ZIP / TAR(.gz/.bz2/.xz) / RAR / 7z دون فك الضغط
+- تحرير مستندات Office: DOCX / XLSX / PPTX (عبر OnlyOffice Document Server، تكامل اختياري)
+- رفع / تنزيل / إعادة تسمية / نسخ / نقل / إنشاء مجلد
 
-**终端**
-- 多 tab 共享终端（node-pty + xterm.js）
-- 断线重连，输出不丢失
-- headless VT 回放
+**الطرفية**
+- طرفية مشتركة متعددة التبويبات (node-pty + xterm.js)
+- إعادة الاتصال بعد الانقطاع دون فقدان المخرجات
+- إعادة تشغيل headless VT
 
-**集成与插件**
-- 插件市场：浏览、安装、卸载，并与本地已装插件同步
-- MCP 服务器：查看状态、整体重载、OAuth 登录
-- Apps / 连接器：列出可用连接器与其工具清单（实验性）
+**التكاملات والإضافات**
+- متجر الإضافات: تصفح وتثبيت وإزالة، مع مزامنة الإضافات المثبتة محليًا
+- خوادم MCP: عرض الحالة وإعادة تحميل شاملة وتسجيل الدخول عبر OAuth
+- التطبيقات / الموصلات: عرض الموصلات المتاحة وقائمة أدواتها (تجريبي)
 
-**其他**
-- JWT + API Key 认证
-- 插件/MCP 服务器管理
-- 深色/浅色主题，中英文切换
-- 响应式布局，手机平板也能用
-- Docker 一键部署
+**أخرى**
+- مصادقة JWT + API Key
+- إدارة الإضافات/خوادم MCP
+- سمة داكنة/فاتحة، تبديل بين العربية والإنجليزية
+- تصميم متجاوب يعمل على الهاتف واللوحي
+- نشر بنقرة واحدة عبر Docker
 
-## 技术栈
+## التقنيات المستخدمة
 
 ```
-浏览器
+المتصفح
   React 19 · Vite 8 · TanStack (Router + Query + Virtual)
   Zustand · Socket.IO Client · Monaco Editor · xterm.js
   Tailwind CSS 4 · shadcn/ui · Framer Motion · dnd-kit
-  React Flow (@xyflow/react) + d3-hierarchy（分支图）
+  React Flow (@xyflow/react) + d3-hierarchy (رسم التفرعات)
      ↕  REST + WebSocket
-后端
+الخادم الخلفي
   NestJS 11 · Fastify 5 · Socket.IO · node-pty
   SQLite (better-sqlite3 + Drizzle ORM) · Pino
      ↕  stdio JSON-RPC
-  codex app-server（子进程）
+  codex app-server (عملية فرعية)
 
-测试
-  Vitest（前后端统一）· SWC（后端装饰器元数据）
-  jsdom + Testing Library（前端组件）
+الاختبارات
+  Vitest (موحّد للواجهة والخادم) · SWC (بيانات وصفية للديكوريتور في الخادم)
+  jsdom + Testing Library (مكونات الواجهة)
 ```
 
-## 快速开始
+## البدء السريع
 
-### 前置条件
+### المتطلبات المسبقة
 
 - Node.js >= 20
 - pnpm >= 9
-- [Codex CLI](https://github.com/openai/codex) 已安装并可用
+- [Codex CLI](https://github.com/openai/codex) مثبّت وجاهز للاستخدام
 
-### Docker 部署（推荐）
+### النشر عبر Docker (موصى به)
 
-直接从 GHCR 拉取镜像，无需本地构建：
+اسحب الصورة مباشرة من GHCR دون بناء محلي:
 
 ```bash
-# 创建 .env
+# إنشاء ملف .env
 cat <<EOF > .env
 WEBUI_API_KEY=your-secret-key
 OPENAI_API_KEY=sk-xxx
 EOF
 
-# 启动（自动拉取多架构镜像）
+# التشغيل (سحب تلقائي لصورة متعددة المعماريات)
 docker compose up -d
 ```
 
-或者手动运行：
+أو التشغيل يدويًا:
 
 ```bash
 docker run -d --name codex-webui \
@@ -115,11 +115,11 @@ docker run -d --name codex-webui \
   ghcr.io/limlll/codex-webui:latest
 ```
 
-服务运行在 `http://localhost:8172`。
+تعمل الخدمة على `http://localhost:8172`.
 
-> `/root` 卷持久化 codex/claude/MCP 配置及运行时工具链。首次启动自动释放内置 seed。
+> وحدة التخزين `/root` تحفظ إعدادات codex/claude/MCP وسلسلة الأدوات وقت التشغيل. عند أول تشغيل تُستخرج البذرة المدمجة تلقائيًا.
 
-### 本地开发
+### التطوير المحلي
 
 ```bash
 git clone https://github.com/LimLLL/codex-webui.git
@@ -127,76 +127,76 @@ cd codex-webui
 pnpm install
 
 cp .env.example .env
-# 编辑 .env，至少设置 WEBUI_API_KEY
+# حرّر .env، واضبط WEBUI_API_KEY على الأقل
 
-# 启动后端（默认端口 8172）
+# تشغيل الخادم الخلفي (المنفذ الافتراضي 8172)
 pnpm start:dev
 
-# 另一个终端，启动前端（端口 5173，自动代理到后端）
+# في طرفية أخرى، شغّل الواجهة الأمامية (المنفذ 5173، مع وكيل تلقائي إلى الخادم)
 cd web && pnpm dev
 ```
 
-打开 `http://localhost:5173` 即可使用。
+افتح `http://localhost:5173` للاستخدام.
 
-## 环境变量
+## متغيرات البيئة
 
-| 变量 | 必填 | 默认值 | 说明 |
+| المتغير | إلزامي | القيمة الافتراضية | الوصف |
 |------|:----:|--------|------|
-| `WEBUI_API_KEY` | 是 | — | 登录密钥，同时用于派生 JWT 签名 |
-| `PORT` | 否 | `8172` | 后端监听端口 |
-| `OPENAI_API_KEY` | 否 | — | Codex 使用 OpenAI API 时的密钥 |
-| `CODEX_BIN` | 否 | `codex` | codex CLI 可执行文件路径 |
-| `CODEX_HOME` | 否 | `~/.codex` | Codex 主目录 |
-| `LOG_LEVEL` | 否 | `info` | Pino 日志级别 |
-| `WEBUI_DB_PATH` | 否 | `CODEX_HOME/codex-webui.sqlite` | SQLite 数据库路径 |
+| `WEBUI_API_KEY` | نعم | — | مفتاح تسجيل الدخول، ويُستخدم أيضًا لاشتقاق توقيع JWT |
+| `PORT` | لا | `8172` | منفذ استماع الخادم الخلفي |
+| `OPENAI_API_KEY` | لا | — | مفتاح OpenAI API عند استخدام Codex لواجهة OpenAI |
+| `CODEX_BIN` | لا | `codex` | مسار الملف التنفيذي لـ codex CLI |
+| `CODEX_HOME` | لا | `~/.codex` | الدليل الرئيسي لـ Codex |
+| `LOG_LEVEL` | لا | `info` | مستوى تسجيل Pino |
+| `WEBUI_DB_PATH` | لا | `CODEX_HOME/codex-webui.sqlite` | مسار قاعدة بيانات SQLite |
 
-### Runtime Settings
+### إعدادات وقت التشغيل (Runtime Settings)
 
-`security.workspaceRoots`、`files.uploadMaxBytes`、`terminal.defaultCwd`、`terminal.maxSessions`、`terminal.graceMs`、`terminal.scrollback` 已迁入 SQLite runtime settings，可在 Settings 页面或 `/api/settings` 修改；同名历史环境变量仍作为 DB 未设置时的 fallback 生效。
-Docker Compose 保留 `WORKSPACE_ROOTS=/workspaces`，用于首次启动时为挂载的 `/workspaces` 提供 bootstrap fallback。
+تم نقل `security.workspaceRoots` و`files.uploadMaxBytes` و`terminal.defaultCwd` و`terminal.maxSessions` و`terminal.graceMs` و`terminal.scrollback` إلى إعدادات وقت التشغيل في SQLite، ويمكن تعديلها من صفحة Settings أو عبر `/api/settings`؛ وتبقى متغيرات البيئة التاريخية بنفس الأسماء فعّالة كقيمة احتياطية عند عدم ضبطها في قاعدة البيانات.
+يحتفظ Docker Compose بـ `WORKSPACE_ROOTS=/workspaces` لتوفير قيمة bootstrap احتياطية لـ `/workspaces` الموصول عند أول تشغيل.
 
-## 项目结构
+## بنية المشروع
 
 ```
-├── src/                  # NestJS 后端
-│   ├── codex/            # 进程管理、JSON-RPC 客户端
-│   ├── threads/          # 线程 CRUD、WebSocket 网关
-│   ├── files/            # 文件操作、路径安全校验
-│   ├── terminal/         # 多 tab 终端（node-pty）
-│   ├── auth/             # JWT + API Key 认证
+├── src/                  # الخادم الخلفي NestJS
+│   ├── codex/            # إدارة العمليات وعميل JSON-RPC
+│   ├── threads/          # عمليات CRUD للخيوط وبوابة WebSocket
+│   ├── files/            # عمليات الملفات والتحقق من أمان المسارات
+│   ├── terminal/         # طرفية متعددة التبويبات (node-pty)
+│   ├── auth/             # مصادقة JWT + API Key
 │   ├── database/         # SQLite + Drizzle ORM
-│   └── ...               # 其他模块
-├── web/                  # React 前端
+│   └── ...               # وحدات أخرى
+├── web/                  # الواجهة الأمامية React
 │   └── src/
-│       ├── routes/       # TanStack Router 页面
-│       ├── components/   # UI 组件
-│       ├── stores/       # Zustand 状态管理
-│       ├── hooks/        # 自定义 hooks
-│       └── generated/    # Hey API SDK（自动生成）
-├── Dockerfile            # 多阶段构建 + seed root
+│       ├── routes/       # صفحات TanStack Router
+│       ├── components/   # مكونات واجهة المستخدم
+│       ├── stores/       # إدارة الحالة Zustand
+│       ├── hooks/        # خطافات مخصصة
+│       └── generated/    # Hey API SDK (مُولّد تلقائيًا)
+├── Dockerfile            # بناء متعدد المراحل + seed root
 └── docker-compose.yml
 ```
 
-## 常用命令
+## الأوامر الشائعة
 
 ```bash
-pnpm start:dev          # 后端开发模式
-pnpm build              # 编译后端
-pnpm test               # 后端测试（Vitest）
-pnpm test:cov           # 后端测试 + 覆盖率
-pnpm lint               # ESLint 检查（含前端）
-pnpm db:generate        # 生成数据库迁移
-pnpm db:migrate         # 执行迁移
-cd web && pnpm dev      # 前端开发模式
-cd web && pnpm build    # 前端构建（输出到 public/）
-cd web && pnpm test     # 前端测试（Vitest + jsdom）
+pnpm start:dev          # وضع تطوير الخادم الخلفي
+pnpm build              # تجميع الخادم الخلفي
+pnpm test               # اختبارات الخادم الخلفي (Vitest)
+pnpm test:cov           # اختبارات الخادم الخلفي + التغطية
+pnpm lint               # فحص ESLint (يشمل الواجهة الأمامية)
+pnpm db:generate        # توليد ترحيل قاعدة البيانات
+pnpm db:migrate         # تنفيذ الترحيل
+cd web && pnpm dev      # وضع تطوير الواجهة الأمامية
+cd web && pnpm build    # بناء الواجهة الأمامية (المخرجات إلى public/)
+cd web && pnpm test     # اختبارات الواجهة الأمامية (Vitest + jsdom)
 ```
 
-## HTTPS / 反向代理
+## HTTPS / الوكيل العكسي
 
-Codex WebUI 自身只监听 HTTP（默认 `0.0.0.0:8172`），生产环境建议用反向代理终止 HTTPS。
+يستمع Codex WebUI نفسه على HTTP فقط (افتراضيًا `0.0.0.0:8172`)، ويُفضّل في بيئة الإنتاج استخدام وكيل عكسي لإنهاء HTTPS.
 
-> **注意**：`WEBUI_API_KEY` 在纯 HTTP 下明文传输，公网部署务必启用 HTTPS。
+> **تنبيه**: `WEBUI_API_KEY` يُنقل كنص صريح عبر HTTP، لذا يجب تمكين HTTPS عند النشر على الإنترنت العام.
 
 ### Nginx
 
@@ -208,7 +208,7 @@ server {
     ssl_certificate     /etc/ssl/certs/codex.pem;
     ssl_certificate_key /etc/ssl/private/codex.key;
 
-    client_max_body_size 200m;  # 匹配文件上传限制
+    client_max_body_size 200m;  # يطابق حد رفع الملفات
 
     location / {
         proxy_pass http://127.0.0.1:8172;
@@ -219,7 +219,7 @@ server {
         proxy_set_header X-Forwarded-Host  $host;
     }
 
-    # Socket.IO WebSocket 升级
+    # ترقية Socket.IO WebSocket
     location /socket.io/ {
         proxy_pass http://127.0.0.1:8172;
         proxy_http_version 1.1;
@@ -240,11 +240,11 @@ server {
 }
 ```
 
-Docker Compose 中使用时，`proxy_pass` 改为 `http://codex-webui:8172`，并将 `ports` 改为 `expose`。
+عند استخدام Docker Compose، غيّر `proxy_pass` إلى `http://codex-webui:8172`، واستبدل `ports` بـ `expose`.
 
-### 部署到子目录
+### النشر في دليل فرعي
 
-同一个镜像可以同时用于域名根目录和代理子目录（例如 `https://cc.example.com/codex/`），无需为每个路径重新构建。子目录代理需要通过 `X-Forwarded-Prefix` 告诉 WebUI 浏览器侧的公开路径：
+يمكن استخدام الصورة نفسها لجذر النطاق وللدليل الفرعي عبر الوكيل (مثل `https://cc.example.com/codex/`) دون إعادة البناء لكل مسار. يحتاج الوكيل في الدليل الفرعي إلى إخبار WebUI بالمسار العام من جهة المتصفح عبر `X-Forwarded-Prefix`:
 
 ```bash
 docker build \
@@ -252,7 +252,7 @@ docker build \
   -t codex-webui:0.153.2 .
 ```
 
-Nginx 必须保留浏览器侧的 `/codex/` 前缀，并在转发到后端时将它移除。`location` 和 `proxy_pass` 末尾的 `/` 均不可省略：
+يجب على Nginx الإبقاء على بادئة `/codex/` من جهة المتصفح وإزالتها عند التمرير إلى الخادم الخلفي. علامة `/` في نهاية `location` و`proxy_pass` لا يمكن حذفها:
 
 ```nginx
 location = /codex {
@@ -274,11 +274,11 @@ location /codex/ {
 }
 ```
 
-根目录反代无需设置 `X-Forwarded-Prefix`。WebUI 会按每个请求动态生成正确的静态资源、前端路由、REST API 和 Socket.IO 基础路径，因此同一镜像可同时服务两种代理方式。若使用 OnlyOffice，请将 `general.publicBaseUrl` 设置为包含子目录的完整地址，例如 `https://cc.example.com/codex`。
+لا يحتاج الوكيل العكسي على الجذر إلى ضبط `X-Forwarded-Prefix`. يولّد WebUI لكل طلب المسار الأساسي الصحيح للموارد الثابتة ومسارات الواجهة الأمامية وREST API وSocket.IO، لذا تخدم الصورة نفسها الحالتين معًا. عند استخدام OnlyOffice، اضبط `general.publicBaseUrl` على العنوان الكامل مع الدليل الفرعي، مثل `https://cc.example.com/codex`.
 
 ### Caddy
 
-Caddy 自动签发 Let's Encrypt 证书，自动处理 WebSocket 升级：
+يصدر Caddy شهادات Let's Encrypt تلقائيًا ويتعامل مع ترقية WebSocket تلقائيًا:
 
 ```caddyfile
 codex.example.com {
@@ -286,22 +286,20 @@ codex.example.com {
 }
 ```
 
-### OnlyOffice 注意事项
+### ملاحظات OnlyOffice
 
-反向代理下 OnlyOffice 需要知道公开 URL 才能回调保存。代理正确传递 `X-Forwarded-Proto` / `X-Forwarded-Host` 即可自动检测；也可在 Settings → General 显式设置 `general.publicBaseUrl`。
+يحتاج OnlyOffice تحت الوكيل العكسي إلى معرفة العنوان العام للاستدعاء الراجع والحفظ. يكفي أن يمرر الوكيل `X-Forwarded-Proto` / `X-Forwarded-Host` بشكل صحيح ليُكتشف تلقائيًا؛ ويمكن أيضًا ضبط `general.publicBaseUrl` صراحةً من Settings → General.
 
-## 贡献
+## المساهمة
 
-欢迎提 issue 和 PR。开发环境搭建、代码规范、测试要求和提交流程见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+نرحّب بالـ issues والـ PRs. راجع [CONTRIBUTING.md](./CONTRIBUTING.md) لإعداد بيئة التطوير ومعايير الشيفرة ومتطلبات الاختبار وآلية الإرسال.
 
-报 bug 前请先确认问题出在 WebUI 而不是 Codex CLI 本身；[Bug 模板](./.github/ISSUE_TEMPLATE/bug_report.yml)会引导你从 Diagnostics 页面导出诊断信息。
+قبل الإبلاغ عن خطأ، تأكد أولًا أن المشكلة في WebUI وليست في Codex CLI نفسه؛ [قالب الأخطاء](./.github/ISSUE_TEMPLATE/bug_report.yml) سيرشدك لتصدير معلومات التشخيص من صفحة Diagnostics.
 
-**安全问题请勿公开提交**，走私密上报渠道，见 [SECURITY.md](./SECURITY.md)。
+**لا تُبلغ عن المشكلات الأمنية علنًا**، بل عبر قناة الإبلاغ الخاصة، راجع [SECURITY.md](./SECURITY.md).
 
-## License
+## الترخيص
 
 Copyright (C) 2026 LimLLL
 
-本项目采用 [GNU Affero General Public License v3.0 或更新版本](./LICENSE)（`AGPL-3.0-or-later`）。
-
-注意 AGPL 的网络条款：修改本项目并通过网络对外提供服务时，需要向使用者提供修改后的完整源码。
+هذا المشروع مرخّص بموجب [GNU Affero General Public License v3.0 أو أحدث](./LICENSE) (`AGPL-3.0-or-later`).
